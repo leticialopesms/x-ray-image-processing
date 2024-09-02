@@ -1,33 +1,42 @@
+# Este script envia arquivos DICOM para o Orthanc usando a API REST.
+
 import os   
 import requests
 
-# Configurações
-ORTHANC_URL = "http://localhost:8042/instances" # Endpoint do Orthanc para envio de arquivos
-ORTHANC_USERNAME = "orthanc"                    # Usuário padrão do Orthanc
-ORTHANC_PASSWORD = "orthanc"                    # Senha padrão do Orthanc
-DICOM_DIR = os.getcwd() + "/dicom_samples"      # Diretório onde os arquivos DICOM estão armazenados
+# Endpoint do Orthanc para envio de arquivos
+ORTHANC_URL = "http://localhost:8042/instances"
+# Credenciais de autenticação
+ORTHANC_USERNAME = "leticia"
+ORTHANC_PASSWORD = "123456"
+# Diretório onde os arquivos DICOM estão armazenados
+DICOM_DIR = os.getcwd() + "/dicom_samples"
 
-def send_dicom_to_orthanc(file_path):
-    """
+
+def send_dicom_file(file_path):
+    '''
     Envia um arquivo DICOM para o Orthanc usando a API REST.
     Args:
         file_path (str): Caminho completo do arquivo DICOM.
-    """
-    file_name = os.path.basename(file_path)
+    '''
     with open(file_path, 'rb') as dicom_file:
         # O dicionário files é usado para enviar arquivos em uma requisição HTTP
+        file_name = os.path.basename(file_path)
         files = {'file': (file_name, dicom_file, 'application/dicom')}
-        # Enviando o arquivo DICOM para o Orthanc usando a API REST
+
+        # Envia o arquivo DICOM para o Orthanc usando a API REST
         response = requests.post(
             ORTHANC_URL,                                # URL do Orthanc
             files=files,                                # Arquivo DICOM a ser enviado
-            auth=(ORTHANC_USERNAME, ORTHANC_PASSWORD)   # Autenticação básica à requisição HTTP
+            auth=(ORTHANC_USERNAME, ORTHANC_PASSWORD)   # Autenticação à requisição HTTP
         )
+
+        # Verifica se o arquivo foi enviado com sucesso
         if response.status_code == 200:
             print(f"Arquivo {file_name} enviado com sucesso!")
         else:
             print(f"Falha ao enviar o arquivo {file_name}. Código de status: {response.status_code}")
             print("Resposta: ", response.text)
+
 
 def main():
     # Verifica se o diretório DICOM_DIR existe
@@ -40,8 +49,8 @@ def main():
         for file in files:
             if file.lower().endswith(".dcm"):    # Verifica se o arquivo é um DICOM
                 file_path = os.path.join(root, file)
-                send_dicom_to_orthanc(file_path)
+                send_dicom_file(file_path)
+4
 
 if __name__ == "__main__":
-    main()
-
+    main()  # Envia os arquivos DICOM para o Orthanc
