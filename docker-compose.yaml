@@ -1,4 +1,4 @@
-version: '3.1'  # Secrets are only available since this version of Docker Compose
+# version: '3.8'  # Secrets are only available since 3.1 version of Docker Compose
 services:
   orthanc:
     image: jodogne/orthanc-plugins:1.12.4
@@ -9,7 +9,9 @@ services:
     secrets:
       - orthanc.json
     environment:
-      - ORTHANC_NAME=orthanc
+      - ORTHANC_NAME=Desafio MICLab
+      - ORTHANC_USER=leticia
+      - ORTHANC_PASSWORD=123456
 secrets:
   orthanc.json:
     file: orthanc.json
