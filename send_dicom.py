@@ -9,7 +9,7 @@ ORTHANC_URL = "http://localhost:8042/instances"
 ORTHANC_USERNAME = "leticia"
 ORTHANC_PASSWORD = "123456"
 # Diretório onde os arquivos DICOM estão armazenados
-DICOM_DIR = os.getcwd() + "/dicom_samples"
+DICOM_DIR = "dicom_samples"
 
 
 def send_dicom_file(file_path):
@@ -39,12 +39,10 @@ def send_dicom_file(file_path):
 
 
 def main():
-    # Verifica se o diretório DICOM_DIR existe
     if not os.path.exists(DICOM_DIR):
         print(f"Diretório {DICOM_DIR} não encontrado.")
         return
 
-    # Percorre todos os arquivos no diretório DICOM_DIR
     for root, _, files in os.walk(DICOM_DIR):    # Percorre todos os arquivos no diretório DICOM_DIR e subdiretórios
         for file in files:
             if file.lower().endswith(".dcm"):    # Verifica se o arquivo é um DICOM
@@ -53,4 +51,4 @@ def main():
 4
 
 if __name__ == "__main__":
-    main()  # Envia os arquivos DICOM para o Orthanc
+    main()
