@@ -1,5 +1,5 @@
-#!/usr/bin/env python
-# coding: utf-8
+# Este script processa um diretório de arquivos DICOM utilizando o modelo pré-treinado TorchXRayVision
+# para detecção de patologias em imagens de raio-x, e salva os resultados em um arquivo JSON.
 
 import os
 import sys
@@ -9,66 +9,84 @@ from tqdm import tqdm
 import pandas as pd
 import torch
 import torchxrayvision as xrv
+import json
 import torchvision, torchvision.transforms
 
+# Configuração de argumentos de linha de comando
 parser = argparse.ArgumentParser()
-parser.add_argument('dicom_dir', type=str, help='Directory with DICOMs to process')
-parser.add_argument('output_csv', type=str, help='CSV file to write the outputs')
-parser.add_argument('-weights', type=str,default="densenet121-res224-all")
-parser.add_argument('-cuda', default=False, action='store_true', help='Run on cuda')
+parser.add_argument('dicom_dir', type=str, help='Directory with DICOM files to process')
+parser.add_argument('output', type=str, help='File to write the outputs')
+parser.add_argument('-weights', type=str, default="densenet121-res224-all", help='Model weights to use')
+parser.add_argument('-cuda', default=False, action='store_true', help='Run on cuda (GPU)')
 parser.add_argument('-resize', default=False, action='store_true', help='Resize images to 224x224')
 cfg = parser.parse_args()
 
+# Verifica se o diretório de DICOMs existe
 if not os.path.isdir(cfg.dicom_dir):
     print('dicom_dir must be a directory')
     sys.exit(1)
 
+# Carrega o modelo especificado
 model = xrv.models.get_model(cfg.weights)
 
-# Move model to GPU if available
+# Move o modelo para a GPU se disponível
 if cfg.cuda:
     model = model.cuda()
 
-# the models will resize the input to the correct size so this is optional
+# Define a transformação a ser aplicada nas imagens
 if cfg.resize:
     transform = torchvision.transforms.Compose([xrv.datasets.XRayCenterCrop(),
                                                 xrv.datasets.XRayResizer(224)])
 else:
     transform = torchvision.transforms.Compose([xrv.datasets.XRayCenterCrop()])
 
+# Lista para armazenar os resultados
 outputs = []
-for file in tqdm(os.listdir(cfg.dicom_dir)):
-    dicom_path = os.path.join(cfg.dicom_dir, file)
-    filename = os.path.basename(dicom_path)
-    try:
-        # Leitura do arquivo DICOM
-        dicom = xrv.utils.read_xray_dcm(dicom_path, voi_lut=True, fix_monochrome=True)
 
-        # Check that images are 2D arrays
-        if len(dicom.shape) > 2:
-            dicom = dicom[:, :, 0]
-        if len(dicom.shape) < 2:
-            print("error, dimension lower than 2 for image")
+# Itera recursivamente sobre todos os arquivos em dicom_dir e subdiretórios
+for root, dirs, files in os.walk(cfg.dicom_dir):
+    for file in tqdm(files):
+        file_path = os.path.join(root, file)
+        filename = os.path.basename(file_path)
 
-        # Add color channel
-        dicom = dicom[None, :, :]
+        # Processa apenas arquivos DICOM (ignora outros tipos de arquivos e diretórios)
+        if file.lower().endswith('.dcm'):
+            try:
+                # Carrega o arquivo DICOM utilizando torchxrayvision
+                # Os argumentos voi_lut e fix_monochrome são necessários para corrigir problemas relacionados ao max value image
+                dicom = xrv.utils.read_xray_dcm(file_path, voi_lut=True, fix_monochrome=True)
+                
+                # Verifica se as imagens são arrays 2D
+                if len(dicom.shape) > 2:
+                    dicom = dicom[:, :, 0]
+                if len(dicom.shape) < 2:
+                    print("Error: dimension lower than 2 for image")
 
-        dicom = transform(dicom)
+                dicom = dicom[None, :, :]   # Adiciona dimensão de cor
 
-        output = {}
-        with torch.no_grad():
-            dicom = torch.from_numpy(dicom).unsqueeze(0)
-            
-            if cfg.cuda:
-                dicom = dicom.to('cuda')
-            preds = model(dicom).cpu()
-            # output = dict(zip(xrv.datasets.default_pathologies,preds[0]))
-            output = {pathology: float(pred) for pathology, pred in zip(xrv.datasets.default_pathologies, preds[0])}
-            output['filename'] = filename
-            outputs.append(output)
+                dicom = transform(dicom)    # Aplica transformação
 
-    except Exception as e:
-        print(f'Error with {filename}: {e}')
-        
-df = pd.DataFrame(outputs).set_index('filename')
-df.to_csv(cfg.output_csv)
+                with torch.no_grad():
+                    dicom = torch.from_numpy(dicom).unsqueeze(0)  # Adiciona dimensão de batch
+
+                    if cfg.cuda:
+                        dicom = dicom.to('cuda')
+                    
+                    # Realiza a predição com o modelo
+                    preds = model(dicom).cpu()
+                    output = {pathology: float(pred) for pathology, pred in zip(xrv.datasets.default_pathologies, preds[0])}
+                    output['filename'] = filename
+                    outputs.append(output)
+
+            except Exception as e:
+                print(f'Error with DICOM file {filename}: {e}')
+
+print(f'Processed {len(outputs)} DICOM files')
+
+# Salva os resultados em um arquivo JSON
+with open(cfg.output, 'w') as json_file:
+    json.dump(outputs, json_file, indent=4)
+
+# Salva os resultados em um arquivo CSV
+# df = pd.DataFrame(outputs).set_index('filename')
+# df.to_csv(cfg.output)
