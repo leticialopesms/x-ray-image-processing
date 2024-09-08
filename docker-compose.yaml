@@ -1,17 +1,16 @@
 # version: '3.8'  # Secrets are only available since 3.1 version of Docker Compose
 services:
   orthanc:
-    image: jodogne/orthanc-plugins:1.12.4
+    build:
+      context: ./orthanc
+      dockerfile: Dockerfile
+    image: orthanc_project
     command: /run/secrets/  # Path to the configuration files (stored as secrets)
     ports:
-      - 4242:4242 # Porta para comunicação DICOM
-      - 8042:8042 # Porta para acesso via navegador
+      - 4242:4242 # Port for DICOM
+      - 8042:8042 # Port for HTTP
     secrets:
       - orthanc.json
-    environment:
-      - ORTHANC_NAME=Desafio MICLab
-      - ORTHANC_USER=leticia
-      - ORTHANC_PASSWORD=123456
 secrets:
   orthanc.json:
-    file: orthanc.json
+    file: ./orthanc/orthanc.json

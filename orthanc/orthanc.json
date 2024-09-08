@@ -1,0 +1,9 @@
+{
+    "Name" : "Desafio MICLab",
+    "RemoteAccessAllowed" : true,
+    "RegisteredUsers":
+        {
+            "leticia":"123456",
+            "orthanc":"orthanc"
+        }
+}

@@ -1,8 +1,0 @@
-{
-    "Name" : "${ORTHANC_NAME}",
-    "RemoteAccessAllowed" : true,
-    "RegisteredUsers":
-        {
-            "${ORTHANC_USER}":"${ORTHANC_PASSWORD}"
-        }
-}
