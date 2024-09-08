@@ -2,7 +2,7 @@
 services:
   orthanc:
     build:
-      context: ./orthanc
+      context: .
       dockerfile: Dockerfile
     image: orthanc_project
     command: /run/secrets/  # Path to the configuration files (stored as secrets)

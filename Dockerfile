@@ -17,4 +17,4 @@ RUN /.venv/bin/pip install --no-cache-dir highdicom
 ENV PYTHONPATH=/.venv/lib64/python3.11/site-packages/
 
 WORKDIR /app
-COPY ../ .
+COPY . .

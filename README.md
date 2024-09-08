@@ -4,7 +4,7 @@ Este repositório é dedicado ao estudo de organização e processamento de imag
 
 ## Conceitos iniciais
 
-Os conceitos a seguir foram fundamentais para entender melhor as ferramentas e as aplicações do desafio, e como elas se relacionam.
+Os conceitos a seguir foram fundamentais para entender melhor as ferramentas e as aplicações do desafio:
 
 * Um **PACS** (Picture Archiving and Communication System) é um sistema de arquivamento e comunicação de imagens médicas que permite o armazenamento, acesso e compartilhamento digital de imagens radiológicas e outros tipos de exames em uma rede hospitalar.
 
@@ -12,38 +12,40 @@ Os conceitos a seguir foram fundamentais para entender melhor as ferramentas e a
 
 * **[Docker](https://www.docker.com/)** é uma plataforma open source que possibilita o empacotamento de uma aplicação dentro de um container, para que ela possa se adequar e rodar em qualquer máquina que tenha essa tecnologia instalada.
 
-* **[OrthanC](https://www.orthanc-server.com/)** é um PACS que permite melhorar os fluxos DICOM nos hospitais e possibilita análises automatizadas de imagens médicas. A **API REST** do Orthanc permite a interação com o servidor para realizar operações como upload, consulta e manipulação de imagens DICOM.
+* **[Orthanc](https://www.orthanc-server.com/)** é um PACS que permite melhorar os fluxos de arquivos DICOM nos hospitais e possibilita análises automatizadas de imagens médicas. A **API REST** do Orthanc permite a interação com o servidor para realizar operações como upload, consulta e manipulação de imagens DICOM.
 
-* **[TorchXRayVision](https://github.com/mlmed/torchxrayvision)** é uma biblioteca que permite integrar conjuntos de dados de raios-x do tórax e modelos de deep learning. O modelo utilizado aqui permite identificar e classificar diversas condições patológicas presentes nas imagens.
+* **[TorchXRayVision](https://github.com/mlmed/torchxrayvision)** é uma biblioteca open source que permite integrar conjuntos de dados de raios-x do tórax e modelos de deep learning. O modelo utilizado aqui permite identificar e classificar diversas condições patológicas presentes nas imagens de radiografia.
 
-## Tarefa 1: Configurar e rodar um PACs OrthanC, utilizando Docker.
+A partir desses conceitos, segui uma série de tarefas para alcançar os objetivos do estudo.
 
-Para iniciar, o Docker Desktop foi instalado e o configurado para o ambiente virtual WSL2, com a ajuda do seguinte repositório: https://github.com/codeedu/wsl2-docker-quickstart.
+## 1. Configurar e rodar um PACs Orthanc, utilizando Docker.
 
-A imagem utilizada foi `jodogne/orthanc-python`, seguindo as instruções em https://orthanc.uclouvain.be/book/users/docker.html.
+Para iniciar, o Docker Desktop foi instalado e configurado para o ambiente virtual WSL2, com a ajuda do repositório [wsl2-docker-quickstart](https://github.com/codeedu/wsl2-docker-quickstart).
 
-Para simplificar o gerenciamento do container do OrthanC, criei os arquivos `docker-compose.yaml` e `orthanc.json`, contendo todas as configurações personalizadas e os plugins necessários para rodar corretamente a aplicação. Mais tarde, conforme com os scripts eram criados, adicionei um `Dockerfile` para incluir todas as dependências necessárias. Para construir a nova imagem e iniciar o container: `docker-compose up -d --build`.
+A imagem utilizada foi `jodogne/orthanc-python`, seguindo as instruções em [Orthanc Book](https://orthanc.uclouvain.be/book/users/docker.html).
 
-Com isso, foi possível interagir com o ambiente do OrthanC a partir do endereço http://localhost:8042. A principal dificuldade nessa tarefa foi entender o ambiente Docker e como utilizá-lo para rodar o OrthanC isoladamente. Os links acima foram essenciais para ajudar nessa configuração.
+Para simplificar o gerenciamento do container do OrthacC, criei os arquivos `docker-compose.yaml` e `orthanc.json`, contendo todas as configurações personalizadas e os plugins necessários para rodar corretamente a aplicação. Mais tarde, de acordo com os scripts criados, adicionei um `Dockerfile` para incluir todas as dependências necessárias. Para construir a nova imagem e iniciar o container: `docker-compose up -d --build`.
 
-## Tarefa 2: Utilizar um script Python para enviar arquivos DICOM.
+Com isso, foi possível interagir com o ambiente do Orthanc pelo endereço http://localhost:8042. A principal dificuldade nessa tarefa foi entender o ambiente Docker e como utilizá-lo para rodar o PACS isoladamente. Os links acima foram essenciais para ajudar nessa configuração.
 
-O script `send_dicom.py` envia os arquivos DICOM na pasta `dicom_samples` para o OrthanC. A API REST do OrthanC foi utilizada para enviar arquivos DICOM para o servidor por meio de uma requisição HTTP, utilizando a função `requests.post()`.
+## 2. Utilizar um script Python para enviar arquivos DICOM.
 
-## Tarefa 3: Computar os resultados de classificação de achados utilizando o TorchXRayVision. 
+O script `send_dicom.py` envia os arquivos DICOM na pasta `dicom_samples` para o Orthanc. A API REST do Orthanc foi utilizada para enviar arquivos DICOM para o servidor por meio de uma requisição HTTP, utilizando a função `requests.post()`.
 
-A partir do repositório https://github.com/mlmed/torchxrayvision, foi possível aplicar o modelo pré-treinado do TorchRayVision para analisar e detectar patologias em imagens de raio-x do tórax. As previsões geradas pelo modelo correspondem a probabilidades associadas à presença de cada patologia em uma imagem de radiografia.
+## 3. Computar os resultados de classificação de achados utilizando o TorchXRayVision. 
 
-Para gerar o `process_dicom.py` e computar os resultados, utilizei como base o código da sessão _getting started_ do repositório. Aqui, a principal dificuldade foi adaptar o código de leitura de imagens para a leitura de arquivos DICOM, já que o modelo de previsão exige formatos e tamanhos específicos para gerar os resultados. Por exemplo, alguns arquivos armazenavam imagens com um tamanho maior que o limite de pixels esperado pela função `xrv.utils.read_xray_dcm`, o que exigia um ajuste nos parâmetros para ler a imagem corretamente. Uma outra solução foi utilizar a função em `read_xray_dcm.py`, que trata especificamente as imagens deste projeto. Particularidades como essa demandaram várias adaptações no código para que as previsões fossem realizadas corretamente.
+A partir do repositório [TorchXRayVision](https://github.com/mlmed/torchxrayvision), foi possível aplicar o modelo pré-treinado da biblioteca para analisar e detectar patologias em imagens de raio-x do tórax. As previsões geradas pelo modelo correspondem a probabilidades associadas à presença de cada patologia em uma imagem de radiografia.
+
+Para gerar o `process_dicom.py` e computar os resultados, utilizei como base o código da sessão _getting started_ do repositório. Aqui, a principal dificuldade foi adaptar o código de leitura de imagens para a leitura de arquivos DICOM, já que o modelo de previsão exige formatos e tamanhos específicos para gerar os resultados. Por exemplo, alguns arquivos armazenavam imagens com um tamanho maior que o limite de pixels esperado pela função `xrv.utils.read_xray_dcm`, o que exigiu um ajuste nos parâmetros para ler a imagem corretamente. Uma outra solução foi utilizar a função em `read_xray_dcm.py`, que trata especificamente as imagens deste projeto. Particularidades como essa demandaram várias adaptações no código para que as previsões fossem realizadas corretamente.
 
 Os resultados com as previsões foram gerados em `resultados_torchxrayvision.json`.
 
-## Tarefa 4: Criar um DICOM SR (Structured Report) para cada arquivo DICOM com os resultados do modelo, e enviá-los para o PACS local OrthanC.
+## 4. Criar um DICOM SR (Structured Report) para cada arquivo DICOM com os resultados do modelo, e enviá-los para o PACS local OrthanC.
 
 Para criar um DICOM SR, utilizei a biblioteca `pydicom` para manipular os arquivos DICOM e adicionar os resultados do modelo TorchXRayVision.
 
 A biblioteca `highdicom` foi usada para criar um _Structured Report_ (SR) a partir de cada DICOM do projeto, que implementa o template _TID1500 Measurement Report_, uma forma padronizada de armazenar medições e avaliações gerais de imagens médicas.
 
-Assim, o script `send_SR.py` foi criado para ler os arquivos DICOM, adicionar os resultados do modelo como um SR, e enviar esses arquivos para o PACS OrthanC.
+Assim, o script `send_SR.py` foi criado para ler os arquivos DICOM, adicionar os resultados do modelo como um SR, e enviar esses arquivos para o PACS Orthanc.
 
 Esta é a parte do projeto na qual senti maior dificuldade. Foi preciso entender a estrutura dos arquivos DICOM SR e como adicionar informações corretamente, já que, nesses arquivos, os dados são organizadas de forma hierárquica e, por isso, deve-se tomar cuidado ao criar cada instância do relatório.
