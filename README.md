@@ -38,7 +38,7 @@ A partir do repositório [TorchXRayVision](https://github.com/mlmed/torchxrayvis
 
 Para gerar o `process_dicom.py` e computar os resultados, utilizei como base o código da sessão _getting started_ do repositório. Aqui, a principal dificuldade foi adaptar o código de leitura de imagens para a leitura de arquivos DICOM, já que o modelo de previsão exige formatos e tamanhos específicos para gerar os resultados. Por exemplo, alguns arquivos armazenavam imagens com um tamanho maior que o limite de pixels esperado pela função `xrv.utils.read_xray_dcm`, o que exigiu um ajuste nos parâmetros para ler a imagem corretamente. Uma outra solução foi utilizar a função em `read_xray_dcm.py`, que trata especificamente as imagens deste projeto. Particularidades como essa demandaram várias adaptações no código para que as previsões fossem realizadas corretamente.
 
-Os resultados com as previsões foram gerados em `resultados_torchxrayvision.json`.
+Os resultados com as previsões foram gerados em `results_torchxrayvision.json`.
 
 ## 4. Criar um DICOM SR (Structured Report) para cada arquivo DICOM com os resultados do modelo, e enviá-los para o PACS local OrthanC.
 
