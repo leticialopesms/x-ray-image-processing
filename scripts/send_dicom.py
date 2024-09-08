@@ -13,6 +13,7 @@ PASSWORD ="123456"                              # Orthanc password
 def upload_file(file_path: str, user: str, password: str):
     """
     Uploads a sigle DICOM file to Orthanc through the REST API.
+    Reference: https://book.orthanc-server.com/cookbook.html#uploading-dicom-instances
 
     Args:
         file_path (str): path to the dicom file.

@@ -20,7 +20,7 @@ PASSWORD = "123456"                                 # Orthanc password
 def create_SR(dcm:pydicom.dataset.FileDataset, result:dict) -> hd.sr.ComprehensiveSR:
     """
     Uses the highdicom library to create the SR document. Implements the TID1500
-    “Measurement Report” template, which provides a standardized way to store
+    Measurement Report template, which provides a standardized way to store
     general measurements and evaluations from images or image regions.
     Reference: https://highdicom.readthedocs.io/en/latest/tid1500.html
 
@@ -95,14 +95,14 @@ def create_SR(dcm:pydicom.dataset.FileDataset, result:dict) -> hd.sr.Comprehensi
         dcm.PatientBirthDate = ""
     if not hasattr(dcm, "PatientSex"):
         dcm.PatientSex = ""
-    if not hasattr(dcm, "StudyID"):
-        dcm.StudyID = dcm.PatientID
     if not hasattr(dcm, "StudyTime"):
         dcm.StudyTime = ""
+    if not hasattr(dcm, "StudyID"):
+        dcm.StudyID = dcm.PatientID
 
     # Creating the Structured Report instance
     sr_dataset = hd.sr.ComprehensiveSR(
-        evidence=[dcm], # each dataset referencd in the SR must be part of the same study
+        evidence=[dcm], # each dataset referenced in the SR must be part of the same study
         content=measurement_report,
         series_instance_uid=hd.UID(),
         series_number=dcm.SeriesNumber,
@@ -146,7 +146,7 @@ def main():
     with open(RESULTS, "r") as f:
         results = json.load(f)
 
-    # Iterates over the results
+    # Iterating over the results
     for result in results:
         dcm_path = result["file_path"]
         dcm_filename = os.path.splitext(os.path.basename(dcm_path))[0]

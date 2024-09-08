@@ -9,8 +9,8 @@ import torchxrayvision as xrv
 from read_xray_dicom import read_xray_dcm
 
 
-DICOM_DIR = "./dicom_samples"              # Directory with DICOM files
-OUTPUT = "./results/results_torchxrayvision.json"  # Output file
+DICOM_DIR = "./dicom_samples"                       # Directory with DICOM files
+OUTPUT = "./results/results_torchxrayvision.json"   # Output file
 
 
 def process_dcm(file_path:str) -> dict:
