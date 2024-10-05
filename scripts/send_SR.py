@@ -128,9 +128,9 @@ def upload_file(file_path: str, user: str, password: str):
 
         # Sending DICOM file to Orthanc using the REST API
         response = requests.post(
-            ORTHANC_URL,            # URL do Orthanc
-            files=files,            # Arquivo DICOM a ser enviado
-            auth=(user, password)   # Autenticação à requisição HTTP
+            ORTHANC_URL,            # Orthanc URL
+            files=files,            # DICOM file to be sent
+            auth=(user, password)   # Authentication for the HTTP request
         )
 
         # Checking if the file was sent successfully
