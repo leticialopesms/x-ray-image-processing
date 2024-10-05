@@ -24,7 +24,32 @@ Para iniciar, o Docker Desktop foi instalado e configurado para o ambiente virtu
 
 A imagem utilizada foi `jodogne/orthanc-python`, seguindo as instruções em [Orthanc Book](https://orthanc.uclouvain.be/book/users/docker.html).
 
-Para simplificar o gerenciamento do container do OrthacC, criei os arquivos `docker-compose.yaml` e `orthanc.json`, contendo todas as configurações personalizadas e os plugins necessários para rodar corretamente a aplicação. Mais tarde, de acordo com os scripts criados, adicionei um `Dockerfile` para incluir todas as dependências necessárias. Para construir a nova imagem e iniciar o container: `docker-compose up -d --build`.
+Para simplificar o gerenciamento do container do OrthacC, criei os arquivos `docker-compose.yaml` e `orthanc.json`, contendo todas as configurações personalizadas e os plugins necessários para rodar corretamente a aplicação. Mais tarde, de acordo com os scripts criados, adicionei um `Dockerfile` para incluir todas as dependências necessárias.
+
+Para construir a nova imagem:
+```sh
+docker-compose build
+```
+
+Para iniciar o container em segundo plano (modo _detached_):
+```sh
+docker-compose up -d
+```
+
+Para abrir um terminal bash no container:
+```sh
+docker-compose exec orthanc bash
+```
+
+Para sair da sessão atual dentro do container:
+```sh
+exit
+```
+
+Para parar e remover os containers, volumes e redes criados:
+```sh
+docker-compose down
+```
 
 Com isso, foi possível interagir com o ambiente do Orthanc pelo endereço http://localhost:8042. A principal dificuldade nessa tarefa foi entender o ambiente Docker e como utilizá-lo para rodar o PACS isoladamente. Os links acima foram essenciais para ajudar nessa configuração.
 
@@ -49,3 +74,7 @@ A biblioteca `highdicom` foi usada para criar um _Structured Report_ (SR) a part
 Assim, o script `send_SR.py` foi criado para ler os arquivos DICOM, adicionar os resultados do modelo como um SR, e enviar esses arquivos para o PACS Orthanc.
 
 Esta é a parte do projeto na qual senti maior dificuldade. Foi preciso entender a estrutura dos arquivos DICOM SR e como adicionar informações corretamente, já que, nesses arquivos, os dados são organizadas de forma hierárquica e, por isso, deve-se tomar cuidado ao criar cada instância do relatório.
+
+## Considerações finais
+
+Durante este desafio, consegui expandir meu conhecimento sobre processamento de imagens médicas e ferramentas que auxiliam no desenvolvimento de software. Cada etapa do projeto foi uma oportunidade de aprendizado, desde a integração de diferentes bibliotecas até a adaptação de modelos de deep learning para aplicações médicas, solidificando meu entendimento sobre o impacto da inteligência artifical e da computação como um todo na área da saúde.
